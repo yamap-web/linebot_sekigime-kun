@@ -22,13 +22,32 @@ app.post("/webhook", (req, res) => {
     const userMessage = req.body.events[0].message.text;
     let replyMessages;
 
-    if (userMessage == "hey せきぎめくん") {
-      // 0から9までのランダムな1桁の数字を生成
-      const randomDigit = Math.floor(Math.random() * 10).toString();
+    if (userMessage === "hey せきぎめくん") {
+      const names = [
+        "こうせい",
+        "げんき",
+        "さち",
+        "りおな",
+        "なな",
+        "やまぴー",
+        "はな",
+        "しゅうへい",
+        "りょうま",
+        "まさき",
+        "だいき",
+        "そう",
+      ];
+
+      // 名前の配列をランダムに並び替える
+      const shuffledNames = names.sort(() => 0.5 - Math.random());
+      const numberedNames = shuffledNames.map(
+        (name, index) => `${index + 1}: ${name}`
+      );
+
       replyMessages = [
         {
           type: "text",
-          text: randomDigit,
+          text: numberedNames.join("\n"),
         },
       ];
 

@@ -19,59 +19,63 @@ app.post("/webhook", (req, res) => {
   res.send("HTTP POST request sent to the webhook URL!");
   // ユーザーがボットにメッセージを送った場合、応答メッセージを送る
   if (req.body.events[0].type === "message") {
-    // APIサーバーに送信する応答トークンとメッセージデータを文字列化する
-    const dataString = JSON.stringify({
-      // 応答トークンを定義
-      replyToken: req.body.events[0].replyToken,
-      // 返信するメッセージを定義
-      messages: [
+    const userMessage = req.body.events[0].message.text;
+    let replyMessages;
+
+    if (userMessage == "hey せきぎめくん") {
+      // 0から9までのランダムな1桁の数字を生成
+      const randomDigit = Math.floor(Math.random() * 10).toString();
+      replyMessages = [
         {
           type: "text",
-          text: "Hello, user",
+          text: randomDigit,
         },
-        {
-          type: "text",
-          text: "May I help you?",
-        },
-      ],
-    });
+      ];
 
-    // リクエストヘッダー。仕様についてはMessaging APIリファレンスを参照してください。
-    const headers = {
-      "Content-Type": "application/json",
-      Authorization: "Bearer " + TOKEN,
-    };
-
-    // Node.jsドキュメントのhttps.requestメソッドで定義されている仕様に従ったオプションを指定します。
-    const webhookOptions = {
-      hostname: "api.line.me",
-      path: "/v2/bot/message/reply",
-      method: "POST",
-      headers: headers,
-      body: dataString,
-    };
-
-    // messageタイプのHTTP POSTリクエストが/webhookエンドポイントに送信された場合、
-    // 変数webhookOptionsで定義したhttps://api.line.me/v2/bot/message/replyに対して
-    // HTTP POSTリクエストを送信します。
-
-    // リクエストの定義
-    const request = https.request(webhookOptions, (res) => {
-      res.on("data", (d) => {
-        process.stdout.write(d);
+      // APIサーバーに送信する応答トークンとメッセージデータを文字列化する
+      const dataString = JSON.stringify({
+        // 応答トークンを定義
+        replyToken: req.body.events[0].replyToken,
+        // 返信するメッセージを定義
+        messages: replyMessages,
       });
-    });
 
-    // エラーをハンドリング
-    // request.onは、APIサーバーへのリクエスト送信時に
-    // エラーが発生した場合にコールバックされる関数です。
-    request.on("error", (err) => {
-      console.error(err);
-    });
+      // リクエストヘッダー。仕様についてはMessaging APIリファレンスを参照してください。
+      const headers = {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + TOKEN,
+      };
 
-    // 最後に、定義したリクエストを送信
-    request.write(dataString);
-    request.end();
+      // Node.jsドキュメントのhttps.requestメソッドで定義されている仕様に従ったオプションを指定します。
+      const webhookOptions = {
+        hostname: "api.line.me",
+        path: "/v2/bot/message/reply",
+        method: "POST",
+        headers: headers,
+      };
+
+      // messageタイプのHTTP POSTリクエストが/webhookエンドポイントに送信された場合、
+      // 変数webhookOptionsで定義したhttps://api.line.me/v2/bot/message/replyに対して
+      // HTTP POSTリクエストを送信します。
+
+      // リクエストの定義
+      const request = https.request(webhookOptions, (res) => {
+        res.on("data", (d) => {
+          process.stdout.write(d);
+        });
+      });
+
+      // エラーをハンドリング
+      // request.onは、APIサーバーへのリクエスト送信時に
+      // エラーが発生した場合にコールバックされる関数です。
+      request.on("error", (err) => {
+        console.error(err);
+      });
+
+      // 最後に、定義したリクエストを送信
+      request.write(dataString);
+      request.end();
+    }
   }
 });
 
